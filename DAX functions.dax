@@ -1,0 +1,49 @@
+"Sales" = 
+sum('Sales SalesTerritory'[SalesLastYear]) + sum('Sales SalesTerritory'[SalesYTD])
+;
+
+"Gross Margin (%)" =
+var R = SUM('Sales SalesOrderDetail'[LineTotal])
+var C = SUM('Production Product'[StandardCost])
+var check = R && C
+return
+if(check, DIVIDE(R-C,R))
+;
+
+"Gross Margin (%) YoY%" =
+IF(
+    ISFILTERED('AWBuildVersion'[ModifiedDate]),
+    ERROR("Time intelligence quick measures can only be grouped or filtered by the Power BI-provided date hierarchy or primary date column."),
+    VAR __PREV_YEAR =
+        CALCULATE(
+            [Gross Margin (%)],
+            DATEADD('Sales SalesOrderDetail'[ModifiedDate], -1, YEAR)
+        )
+    RETURN
+        DIVIDE([Gross Margin (%)] - __PREV_YEAR, __PREV_YEAR)
+)
+;
+
+"Previous Month Sales" =
+var CY = SUM('Sales SalesOrderDetail'[LineTotal])
+var LY = CALCULATE(SUM('Sales SalesOrderDetail'[LineTotal]), PREVIOUSMONTH(('Sales SalesOrderDetail'[ModifiedDate])))
+var check = CY && LY
+return
+if(check, ly)
+;
+
+"Previous Year Sales" =
+var CY = SUM('Sales SalesOrderDetail'[LineTotal])
+var LY = CALCULATE(SUM('Sales SalesOrderDetail'[LineTotal]), SAMEPERIODLASTYEAR(('Sales SalesOrderDetail'[ModifiedDate])))
+var check = CY && LY
+return
+if(check, ly)
+;
+
+"Previous Year Sales (%)" =
+var CY = SUM('Sales SalesOrderDetail'[LineTotal])
+var LY = CALCULATE(SUM('Sales SalesOrderDetail'[LineTotal]), SAMEPERIODLASTYEAR(('Sales SalesOrderDetail'[ModifiedDate])))
+var check = CY && LY
+return
+if(check, DIVIDE(CY-lY,Ly))
+;
